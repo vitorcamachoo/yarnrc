@@ -52,7 +52,7 @@ function printHelp () {
 }
 
 
-function printNpmrcs () {
+function printYarnrcs () {
   console.log('Available yarnrcs:\n')
   fs.readlink(YARNRC, function (err, link) {
     link = link && path.basename(link)
@@ -179,7 +179,7 @@ function partialMatch(match, files) {
 
 // no name and no args
 if (!name && !opts.length)
-  return printNpmrcs()
+  return printYarnrcs()
 
 
 ;(function handleOPtions() {
