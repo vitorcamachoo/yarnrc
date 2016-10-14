@@ -1,22 +1,22 @@
 {
-  "name": "npmrc",
+  "name": "yarnrc",
   "version": "1.1.1",
-  "description": "Switch between different .npmrc files with ease and grace",
+  "description": "Switch between different .yarnrc files with ease and grace",
   "preferGlobal": true,
   "bin": {
-    "npmrc": "./npmrc.js"
+    "yarnrc": "./yarnrc.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/deoxxa/npmrc.git"
+    "url": "git://github.com/deoxxa/yarnrc.git"
   },
   "keywords": [
-    "npmrc",
+    "yarnrc",
     "utility",
     "shell",
     "npm"
   ],
-  "author": "Conrad Pankoff <deoxxa@fknsrs.biz> (http://www.fknsrs.biz/)",
+  "author": "Vitor Camacho",
   "license": "BSD",
   "devDependencies": {
     "rimraf": "*",

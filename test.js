@@ -9,13 +9,13 @@ const test    = require('tape')
     , xtend   = require('xtend')
 
     , cmd     = '"' + process.execPath + '" '
-                + path.join(__dirname, 'npmrc.js')
-    , homedir = path.join(tmpdir, '.npmrcs_test.' + process.pid)
+                + path.join(__dirname, 'yarnrc.js')
+    , homedir = path.join(tmpdir, '.yarnrcs_test.' + process.pid)
     , options = { env: xtend(process.env, { HOME: homedir }) }
-    , npmrc   = path.join(homedir, '.npmrc')
-    , npmrcs  = path.join(homedir, '.npmrcs')
-    , def     = path.join(homedir, '.npmrcs/default')
-    , dotfile = path.join(homedir, '.npmrcs/.dotfile')
+    , yarnrc   = path.join(homedir, '.yarnrc')
+    , yarnrcs  = path.join(homedir, '.yarnrcs')
+    , def     = path.join(homedir, '.yarnrcs/default')
+    , dotfile = path.join(homedir, '.yarnrcs/.dotfile')
 
 
 function cleanup (t) {
@@ -30,8 +30,8 @@ test('blank slate', function (t) {
     t.notOk(err, 'no error')
     t.equal(stderr, '', 'no stderr')
     t.ok(/Initialising/.test(stdout), 'got "initialising" msg')
-    t.ok(/Creating .*\.npmrcs/.test(stdout), 'got "creating" msg')
-    t.ok(/Activating .npmrc "default"/, 'got "activating" msg')
+    t.ok(/Creating .*\.yarnrcs/.test(stdout), 'got "creating" msg')
+    t.ok(/Activating .yarnrc "default"/, 'got "activating" msg')
     t.end()
   })
 })
@@ -39,8 +39,8 @@ test('blank slate', function (t) {
 test('change the registry url', function (t) {
   exec(cmd + ' -r au', options, function (err, stdout, stderr) {
     t.notOk(err, 'no error')
-    t.ok(fs.existsSync(npmrc), '.npmrc file exists')
-    t.ok(fs.existsSync(def), '.npmrc default file exists')
+    t.ok(fs.existsSync(yarnrc), '.yarnrc file exists')
+    t.ok(fs.existsSync(def), '.yarnrc default file exists')
     t.equal(fs.readFileSync(def, 'utf-8').split(os.EOL)[0], 'registry = http://registry.npmjs.org.au/', 'got the right registry url')
     t.end()
   })
@@ -57,22 +57,22 @@ test('error occurs when the wrong argument is supplied to -r', function (t) {
 test('cleanup', cleanup)
 
 
-test('standard .npmrcs', function (t) {
+test('standard .yarnrcs', function (t) {
   mkdirp.sync(homedir)
-  fs.writeFileSync(npmrc, 'foobar', 'utf8')
+  fs.writeFileSync(yarnrc, 'foobar', 'utf8')
 
   exec(cmd, options, function (err, stdout, stderr) {
     t.notOk(err, 'no error')
     t.equal(stderr, '', 'no stderr')
     t.ok(/Initialising/.test(stdout), 'got "initialising" msg')
-    t.ok(/Creating .*\.npmrcs/.test(stdout), 'got "creating" msg')
-    t.ok(/Activating .npmrc "default"/, 'got "activating" msg')
-    t.ok(/Making .*\.npmrc the default/, 'got "making default" msg')
-    t.equal(fs.readFileSync(npmrc, 'utf8'), 'foobar', 'got expected contents of .npmrc')
-    t.equal(fs.readFileSync(def, 'utf8'), 'foobar', 'got expected contents of .npmrcs/default')
-    t.ok(fs.lstatSync(npmrc).isSymbolicLink(), '.npmrc is symlink')
-    t.equal(fs.readlinkSync(npmrc), def, '.npmrc points to "default"')
-    t.deepEqual(fs.readdirSync(npmrcs), [ 'default' ], 'only "default" in .npmrcs')
+    t.ok(/Creating .*\.yarnrcs/.test(stdout), 'got "creating" msg')
+    t.ok(/Activating .yarnrc "default"/, 'got "activating" msg')
+    t.ok(/Making .*\.yarnrc the default/, 'got "making default" msg')
+    t.equal(fs.readFileSync(yarnrc, 'utf8'), 'foobar', 'got expected contents of .yarnrc')
+    t.equal(fs.readFileSync(def, 'utf8'), 'foobar', 'got expected contents of .yarnrcs/default')
+    t.ok(fs.lstatSync(yarnrc).isSymbolicLink(), '.yarnrc is symlink')
+    t.equal(fs.readlinkSync(yarnrc), def, '.yarnrc points to "default"')
+    t.deepEqual(fs.readdirSync(yarnrcs), [ 'default' ], 'only "default" in .yarnrcs')
     t.end()
   })
 })
@@ -84,55 +84,55 @@ test('create noarg', function (t) {
     t.equal(err.code, 1, 'got correct exit code')
     t.equal(stdout, '', 'no stdout')
     t.ok(/Usage/.test(stderr), 'got Usage')
-    t.equal(fs.readFileSync(npmrc, 'utf8'), 'foobar', 'got expected contents of .npmrc')
-    t.deepEqual(fs.readdirSync(npmrcs), [ 'default' ], 'only "default" in .npmrcs')
+    t.equal(fs.readFileSync(yarnrc, 'utf8'), 'foobar', 'got expected contents of .yarnrc')
+    t.deepEqual(fs.readdirSync(yarnrcs), [ 'default' ], 'only "default" in .yarnrcs')
     t.end()
   })
 })
 
 
 test('create new config', function (t) {
-  var foobar = path.join(npmrcs, 'foobar')
+  var foobar = path.join(yarnrcs, 'foobar')
   exec(cmd + ' -c foobar', options, function (err, stdout, stderr) {
     t.notOk(err, 'no error')
     t.equal(stderr, '', 'no stderr')
     t.ok(/Removing old .+\Wdefault\W/.test(stdout), 'got "removing" msg')
-    t.ok(/Activating .npmrc "foobar"/.test(stdout), 'got "activating" msg')
-    t.equal(fs.readFileSync(npmrc, 'utf8'), '', 'got expected contents of .npmrc')
-    t.equal(fs.readFileSync(def, 'utf8'), 'foobar', 'got expected contents of .npmrcs/default')
-    t.equal(fs.readFileSync(foobar, 'utf8'), '', 'got expected contents of .npmrcs/foobar')
-    t.ok(fs.lstatSync(npmrc).isSymbolicLink(), '.npmrc is symlink')
-    t.equal(fs.readlinkSync(npmrc), foobar, '.npmrc points to "foobar"')
-    t.deepEqual(fs.readdirSync(npmrcs), [ 'default', 'foobar' ], '"default" and "foobar" in .npmrcs')
+    t.ok(/Activating .yarnrc "foobar"/.test(stdout), 'got "activating" msg')
+    t.equal(fs.readFileSync(yarnrc, 'utf8'), '', 'got expected contents of .yarnrc')
+    t.equal(fs.readFileSync(def, 'utf8'), 'foobar', 'got expected contents of .yarnrcs/default')
+    t.equal(fs.readFileSync(foobar, 'utf8'), '', 'got expected contents of .yarnrcs/foobar')
+    t.ok(fs.lstatSync(yarnrc).isSymbolicLink(), '.yarnrc is symlink')
+    t.equal(fs.readlinkSync(yarnrc), foobar, '.yarnrc points to "foobar"')
+    t.deepEqual(fs.readdirSync(yarnrcs), [ 'default', 'foobar' ], '"default" and "foobar" in .yarnrcs')
     t.end()
   })
 })
 
 
 test('switch config', function (t) {
-  var foobar = path.join(npmrcs, 'foobar')
+  var foobar = path.join(yarnrcs, 'foobar')
   exec(cmd + ' default', options, function (err, stdout, stderr) {
     t.notOk(err, 'no error')
     t.equal(stderr, '', 'no stderr')
     t.ok(/Removing old .+\Wfoobar\W/.test(stdout), 'got "removing" msg')
-    t.ok(/Activating .npmrc "default"/.test(stdout), 'got "activating" msg')
-    t.equal(fs.readFileSync(npmrc, 'utf8'), 'foobar', 'got expected contents of .npmrc')
-    t.equal(fs.readFileSync(def, 'utf8'), 'foobar', 'got expected contents of .npmrcs/default')
-    t.equal(fs.readFileSync(foobar, 'utf8'), '', 'got expected contents of .npmrcs/foobar')
-    t.ok(fs.lstatSync(npmrc).isSymbolicLink(), '.npmrc is symlink')
-    t.equal(fs.readlinkSync(npmrc), def, '.npmrc points to "foobar"')
-    t.deepEqual(fs.readdirSync(npmrcs), [ 'default', 'foobar' ], '"default" and "foobar" in .npmrcs')
+    t.ok(/Activating .yarnrc "default"/.test(stdout), 'got "activating" msg')
+    t.equal(fs.readFileSync(yarnrc, 'utf8'), 'foobar', 'got expected contents of .yarnrc')
+    t.equal(fs.readFileSync(def, 'utf8'), 'foobar', 'got expected contents of .yarnrcs/default')
+    t.equal(fs.readFileSync(foobar, 'utf8'), '', 'got expected contents of .yarnrcs/foobar')
+    t.ok(fs.lstatSync(yarnrc).isSymbolicLink(), '.yarnrc is symlink')
+    t.equal(fs.readlinkSync(yarnrc), def, '.yarnrc points to "foobar"')
+    t.deepEqual(fs.readdirSync(yarnrcs), [ 'default', 'foobar' ], '"default" and "foobar" in .yarnrcs')
     t.end()
   })
 })
 
 
 test('list config', function (t) {
-  fs.writeFileSync(dotfile, '.dotfile', 'utf8')
+  fs.writeFileSync(dotfile, '.dotfile', 'utf8');
   exec(cmd, options, function (err, stdout, stderr) {
     t.notOk(err, 'no error')
     t.equal(stderr, '', 'no stderr')
-    t.ok(/Available npmrcs/.test(stdout), 'got "available" msg')
+    t.ok(/Available yarnrcs/.test(stdout), 'got "Available" msg')
     t.ok((/\* default$/m).test(stdout), 'listed "default"')
     t.ok((/  foobar$/m).test(stdout), 'listed "foobar"')
     t.notOk((/\.dotfile$/m).test(stdout), 'listed "dotfile"')
@@ -146,17 +146,17 @@ test('switch to non-existent config', function (t) {
     t.ok(err, 'got error')
     t.equal(err.code, 1, 'got correct exit code')
     t.equal(stdout, '', 'no stdout')
-    t.ok(/Couldn't find npmrc file "doobar"/.test(stderr), 'got expected error message')
+    t.ok(/Couldn't find yarnrc file "doobar"/.test(stderr), 'got expected error message')
     t.end()
   })
 })
 
 
-test('partial matching start of npmrc', function (t) {
+test('partial matching start of yarnrc', function (t) {
   exec(cmd + ' foo', options, function (err, stdout, stderr) {
     t.notOk(err, 'no error')
     t.equal(stderr, '', 'no stderr')
-    t.ok(/Activating .npmrc "foobar"/.test(stdout), 'got "activating" msg')
+    t.ok(/Activating .yarnrc "foobar"/.test(stdout), 'got "activating" msg')
     t.end()
   })
 })
@@ -170,7 +170,7 @@ test('partial matching prefers full match over partial', function (t) {
     exec(cmd + ' foobar', options, function (err, stdout, stderr) {
       t.notOk(err, 'no error')
       t.equal(stderr, '', 'no stderr')
-      t.ok(/Activating .npmrc "foobar"/.test(stdout), 'got "activating" msg')
+      t.ok(/Activating .yarnrc "foobar"/.test(stdout), 'got "activating" msg')
       t.end()
     })
   })
@@ -186,7 +186,7 @@ test('partial matching prefers start of word match over partial match', function
         // ensure 'ba' switches to bar not foobar.
         t.notOk(err, 'no error')
         t.equal(stderr, '', 'no stderr')
-        t.ok(/Activating .npmrc "bar"/.test(stdout), 'got "activating" msg')
+        t.ok(/Activating .yarnrc "bar"/.test(stdout), 'got "activating" msg')
         t.end()
       })
     })
@@ -194,11 +194,11 @@ test('partial matching prefers start of word match over partial match', function
 })
 
 
-test('partial matching can match any part of npmrc', function (t) {
+test('partial matching can match any part of yarnrc', function (t) {
   exec(cmd + ' ooba', options, function (err, stdout, stderr) {
     t.notOk(err, 'no error')
     t.equal(stderr, '', 'no stderr')
-    t.ok(/Activating .npmrc "foobar"/.test(stdout), 'got "activating" msg')
+    t.ok(/Activating .yarnrc "foobar"/.test(stdout), 'got "activating" msg')
     t.end()
   })
 })
@@ -209,13 +209,13 @@ test('partial matching matches alphabetically', function (t) {
     t.notOk(err, 'no error')
     exec(cmd + ' default', options, function (err, stdout, stderr) { // switch to default
       t.notOk(err, 'no error')
-      var foobar = path.join(npmrcs, 'foobar')
+      var foobar = path.join(yarnrcs, 'foobar')
       // try match ar from bar, car, foobar
       // should pick bar
       exec(cmd + ' ar', options, function (err, stdout, stderr) {
         t.notOk(err, 'no error')
         t.equal(stderr, '', 'no stderr')
-        t.ok(/Activating .npmrc "bar"/.test(stdout), 'got "activating" msg')
+        t.ok(/Activating .yarnrc "bar"/.test(stdout), 'got "activating" msg')
         t.end()
       })
     })
