@@ -5,8 +5,8 @@ Switch between different .yarnrc files with ease and grace.
 
 Overview
 --------
-This is a adapted version of npmrc([npmrc](https://github.com/deoxxa/npmrc)) to work
-with the new package manager released by Facebook called Yarn. 
+This is an adapted version of npmrc([npmrc](https://github.com/deoxxa/npmrc)) to work
+with the new package manager released by Facebook known as Yarn. 
 If you use a private npm registry, you know the pain of switching between a
 bunch of different .yarnrc files and manually managing symlinks. Let that be a
 problem no more! `yarnrc` is here to save the day, by making it dead simple to
