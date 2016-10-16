@@ -11,10 +11,12 @@
     "url": "git://github.com/vitorcamachoo/yarnrc.git"
   },
   "keywords": [
+    "yarn",
     "yarnrc",
     "utility",
     "shell",
-    "npm"
+    "npm",
+    "npmrc"
   ],
   "author": "Vitor Camacho",
   "license": "BSD",
