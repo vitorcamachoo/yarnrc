@@ -1,6 +1,8 @@
 yarnrc
 =====
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/vitorcamachoo/yarnrc.svg)](https://greenkeeper.io/)
+
 Switch between different .yarnrc files with ease and grace.
 
 Overview
